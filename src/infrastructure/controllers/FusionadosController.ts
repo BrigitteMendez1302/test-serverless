@@ -1,6 +1,6 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import { StarWarsService } from '../services/StarWarsService';
-import { PokemonService } from '../services/PokemonService';
+import { StarWarsService } from '../integrations/StarWarsService';
+import { PokemonService } from '../integrations/PokemonService';
 import { FusionService } from '../../application/FusionService';
 import { FusionRepository } from '../repositories/FusionRepository';
 

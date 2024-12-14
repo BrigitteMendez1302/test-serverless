@@ -1,5 +1,5 @@
-import { StarWarsService } from '../infrastructure/services/StarWarsService';
-import { PokemonService } from '../infrastructure/services/PokemonService';
+import { StarWarsService } from '../infrastructure/integrations/StarWarsService';
+import { PokemonService } from '../infrastructure/integrations/PokemonService';
 import { FusionRepository } from '../infrastructure/repositories/FusionRepository';
 import { Character } from '../domain/Character';
 
@@ -43,5 +43,13 @@ export class FusionService {
     await this.fusionRepository.saveFusionedData(fusionedCharacters);
 
     return fusionedCharacters;
+  }
+
+  async getHistory(limit: number, nextToken?: string) {
+    if (limit <= 0 || limit > 10) {
+      throw new Error("El parámetro 'limit' debe estar entre 1 y 10.");
+    }
+
+    return this.fusionRepository.getFusionHistory(limit, nextToken);
   }
 }

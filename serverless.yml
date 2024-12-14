@@ -13,10 +13,12 @@ provider:
         - dynamodb:Scan      # Permite escanear la tabla
       Resource:
         - "arn:aws:dynamodb:${self:provider.region}:*:table/FusionadosTable" # Tabla DynamoDB específica
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/CustomDataTable"
   memorySize: 128       # Tamaño de memoria para Lambda (ajusta según necesidad)
   timeout: 20           # Tiempo máximo de ejecución en segundos
   environment:          # Variables de entorno para DynamoDB u otras configuraciones
     FUSIONADOS_TABLE: FusionadosTable  # Nombre de la tabla DynamoDB
+    CUSTOM_DATA_TABLE: CustomDataTable
   logs:
     restApi: true       # Habilita logs detallados para API Gateway
     role: serverlessApiGatewayCloudWatchRole
@@ -30,20 +32,18 @@ functions:
       - http:
           path: fusionados
           method: get
-
-  # almacenar:
-  #   handler: src/infrastructure/controllers/AlmacenarController.handler
-  #   events:
-  #     - http:
-  #         path: almacenar
-  #         method: post
-
-  # historial:
-  #   handler: src/infrastructure/controllers/HistorialController.handler
-  #   events:
-  #     - http:
-  #         path: historial
-  #         method: get
+  almacenar:
+    handler: src/infrastructure/controllers/AlmacenarController.handler
+    events:
+      - http:
+          path: almacenar
+          method: post
+  historial:
+    handler: src/infrastructure/controllers/HistorialController.handler
+    events:
+      - http:
+          path: historial
+          method: get
 
 plugins:
   - serverless-offline
@@ -65,6 +65,18 @@ resources:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: FusionadosTable
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    CustomDataTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: CustomDataTable
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
