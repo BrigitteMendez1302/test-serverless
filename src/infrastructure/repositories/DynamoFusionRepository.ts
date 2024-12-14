@@ -1,8 +1,10 @@
 import { DynamoDBClient, ScanCommand, ScanCommandInput } from "@aws-sdk/client-dynamodb";
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
 import { Character } from "../../domain/Character";
+import { FusionRepository } from "../../domain/interfaces/FusionRepository";
 
-export class FusionRepository {
+
+export class DynamoFusionRepository implements FusionRepository{
   private dynamoDbClient: DynamoDBClient;
   private tableName: string;
 

@@ -1,9 +1,11 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
 import { CustomDataService } from "../../application/CustomDataService";
+import { DynamoCustomDataRepository } from '../repositories/DynamoCustomDataRepository';
 
 export const handler: APIGatewayProxyHandler = async (event) => {
   try {
     const body = JSON.parse(event.body || "{}");
+    const dynamoCustomDataRepository = new DynamoCustomDataRepository();
 
     // Validar los campos requeridos
     if (!body.type || !body.content) {
@@ -13,7 +15,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       };
     }
 
-    const service = new CustomDataService();
+    const service = new CustomDataService(dynamoCustomDataRepository);
     await service.storeCustomData(body);
 
     // Respuesta exitosa

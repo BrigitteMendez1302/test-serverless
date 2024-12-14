@@ -1,12 +1,14 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
 import { HistorialService } from "../../application/HistorialService";
+import { DynamoFusionRepository } from '../repositories/DynamoFusionRepository';
 
 export const handler: APIGatewayProxyHandler = async (event) => {
   try {
     const limit = parseInt(event.queryStringParameters?.limit || "10", 10);
     const nextToken = event.queryStringParameters?.nextToken;
+    const fusionRepository = new DynamoFusionRepository();
 
-    const service = new HistorialService();
+    const service = new HistorialService(fusionRepository);
     const result = await service.getHistory(limit, nextToken);
 
     return {

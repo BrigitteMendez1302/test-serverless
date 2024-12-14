@@ -1,11 +1,10 @@
-import { FusionRepository } from "../infrastructure/repositories/FusionRepository";
+import { FusionRepository } from "../domain/interfaces/FusionRepository";
+
 
 export class HistorialService {
-  private repository: FusionRepository;
-
-  constructor() {
-    this.repository = new FusionRepository();
-  }
+  constructor(
+    private fusionRepository: FusionRepository
+  ) {}
 
   async getHistory(limit: number, nextToken?: string) {
     // Validar el límite (opcional para evitar problemas)
@@ -14,6 +13,6 @@ export class HistorialService {
     }
 
     // Delegar al repositorio la obtención del historial
-    return this.repository.getFusionHistory(limit, nextToken);
+    return this.fusionRepository.getFusionHistory(limit, nextToken);
   }
 }

@@ -1,9 +1,10 @@
+import { PokemonAPI } from "../../domain/interfaces/PokemonAPI";
 import axios from 'axios';
 
-export class PokemonService {
+export class PokemonService implements PokemonAPI {
   private readonly baseURL = 'https://pokeapi.co/api/v2/pokemon-habitat/';
 
-  async getEnrichedHabitats(planets: any[]) {
+  async getEnrichedHabitats(planets: any[]) : Promise<Record<string, string[]>> {
 
     const climateToHabitatMap: Record<string, string> = {
       arid: "rough-terrain",

@@ -1,12 +1,12 @@
-import { StarWarsService } from '../infrastructure/integrations/StarWarsService';
-import { PokemonService } from '../infrastructure/integrations/PokemonService';
-import { FusionRepository } from '../infrastructure/repositories/FusionRepository';
-import { Character } from '../domain/Character';
+import { FusionRepository } from "../domain/interfaces/FusionRepository";
+import { StarWarsAPI } from "../domain/interfaces/StarWarsAPI";
+import { PokemonAPI } from "../domain/interfaces/PokemonAPI";
+import { Character } from "../domain/Character";
 
 export class FusionService {
   constructor(
-    private starWarsService: StarWarsService,
-    private pokemonService: PokemonService,
+    private starWarsService: StarWarsAPI,
+    private pokemonService: PokemonAPI,
     private fusionRepository: FusionRepository
   ) {}
 
@@ -14,13 +14,14 @@ export class FusionService {
     // Obtener personajes
     const characters: Character[] = await this.starWarsService.getCharacters();
 
-
     // Obtener planetas únicos enriquecidos
     const planetMap = await this.starWarsService.getEnrichedPlanets(characters);
+
 
     // Obtener mapeo clima -> Pokémon
     const planets = Object.values(planetMap); // Extraer detalles de planetas
     const climateToPokemonMap = await this.pokemonService.getEnrichedHabitats(planets);
+
 
     // Enriquecer personajes con Pokémon
     const fusionedCharacters = characters.map((character: Character) => {
@@ -40,7 +41,7 @@ export class FusionService {
       };
     });
 
-    await this.fusionRepository.saveFusionedData(fusionedCharacters);
+    // await this.fusionRepository.saveFusionedData(fusionedCharacters);
 
     return fusionedCharacters;
   }

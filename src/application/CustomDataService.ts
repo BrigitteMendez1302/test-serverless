@@ -1,11 +1,10 @@
-import { CustomDataRepository } from "../infrastructure/repositories/CustomDataRepository";
+import { CustomDataRepository } from "../domain/interfaces/CustomDataRepository";
 
 export class CustomDataService {
-  private repository: CustomDataRepository;
 
-  constructor() {
-    this.repository = new CustomDataRepository();
-  }
+  constructor(
+    private repository: CustomDataRepository
+  ) {}
 
   async storeCustomData(data: { type: string; content: Record<string, unknown> }): Promise<void> {
     // Validar el contenido (reglas adicionales si es necesario)
