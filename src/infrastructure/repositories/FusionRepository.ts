@@ -6,6 +6,7 @@ export class FusionRepository {
   private dynamoDbClient: DynamoDBClient;
   private tableName: string;
 
+  // Inicializa el cliente DynamoDB y el nombre de la tabla
   constructor() {
     this.dynamoDbClient = new DynamoDBClient({ region: process.env.AWS_REGION });
     this.tableName = process.env.FUSIONADOS_TABLE!; // Nombre de la tabla desde el entorno
