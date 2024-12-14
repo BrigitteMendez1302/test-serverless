@@ -9,9 +9,10 @@ jspm_packages
 undefined
 
 # Webpack
-
 .webpack
 
 # Swagger
-
 swagger
+
+# dynamodb
+.dynamodb

@@ -2,11 +2,13 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import { StarWarsService } from '../services/StarWarsService';
 import { PokemonService } from '../services/PokemonService';
 import { FusionService } from '../../application/FusionService';
+import { FusionRepository } from '../repositories/FusionRepository';
 
 export const handler: APIGatewayProxyHandler = async () => {
   const starWarsService = new StarWarsService();
   const pokemonService = new PokemonService();
-  const fusionService = new FusionService(starWarsService, pokemonService);
+  const fusionRepository = new FusionRepository();
+  const fusionService = new FusionService(starWarsService, pokemonService, fusionRepository);
 
   try {
     const data = await fusionService.getFusionedData();

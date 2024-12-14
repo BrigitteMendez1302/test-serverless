@@ -1,11 +1,13 @@
 import { StarWarsService } from '../infrastructure/services/StarWarsService';
 import { PokemonService } from '../infrastructure/services/PokemonService';
+import { FusionRepository } from '../infrastructure/repositories/FusionRepository';
 import { Character } from '../domain/Character';
 
 export class FusionService {
   constructor(
     private starWarsService: StarWarsService,
-    private pokemonService: PokemonService
+    private pokemonService: PokemonService,
+    private fusionRepository: FusionRepository
   ) {}
 
   async getFusionedData(): Promise<Character[]> {
@@ -21,7 +23,7 @@ export class FusionService {
     const climateToPokemonMap = await this.pokemonService.getEnrichedHabitats(planets);
 
     // Enriquecer personajes con Pokémon
-    return characters.map((character: Character) => {
+    const fusionedCharacters = characters.map((character: Character) => {
       const planet = planetMap[character.homeworld];
 
       // Obtener el clima principal del planeta
@@ -37,5 +39,9 @@ export class FusionService {
         pokemon_friend: possiblePokemon.slice(0, 5), // Limitar a 5 Pokémon
       };
     });
+
+    await this.fusionRepository.saveFusionedData(fusionedCharacters);
+
+    return fusionedCharacters;
   }
 }

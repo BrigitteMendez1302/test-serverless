@@ -5,11 +5,27 @@ provider:
   name: aws
   runtime: nodejs20.x
   region: us-east-1
+  iamRoleStatements:  # Declaración de permisos IAM para DynamoDB
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem   # Permite insertar elementos
+        - dynamodb:GetItem   # Permite obtener elementos
+        - dynamodb:Scan      # Permite escanear la tabla
+      Resource:
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/FusionadosTable" # Tabla DynamoDB específica
+  memorySize: 128       # Tamaño de memoria para Lambda (ajusta según necesidad)
+  timeout: 20           # Tiempo máximo de ejecución en segundos
+  environment:          # Variables de entorno para DynamoDB u otras configuraciones
+    FUSIONADOS_TABLE: FusionadosTable  # Nombre de la tabla DynamoDB
+  logs:
+    restApi: true       # Habilita logs detallados para API Gateway
+    role: serverlessApiGatewayCloudWatchRole
+    frameworkLambda: true # Logs para Serverless Framework
+
 
 functions:
   fusionados:
     handler: src/infrastructure/controllers/FusionadosController.handler
-    timeout: 40
     events:
       - http:
           path: fusionados
@@ -42,3 +58,17 @@ custom:
     target: 'node20'     # Especifica la versión de Node.js para el código
     platform: 'node'
     concurrency: 10      # Máximo de procesos paralelos para el empaquetado
+
+resources:
+  Resources:
+    FusionadosTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: FusionadosTable
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
