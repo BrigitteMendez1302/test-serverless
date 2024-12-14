@@ -1,0 +1,44 @@
+service: backend-challenge
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+
+functions:
+  fusionados:
+    handler: src/infrastructure/controllers/FusionadosController.handler
+    timeout: 40
+    events:
+      - http:
+          path: fusionados
+          method: get
+
+  # almacenar:
+  #   handler: src/infrastructure/controllers/AlmacenarController.handler
+  #   events:
+  #     - http:
+  #         path: almacenar
+  #         method: post
+
+  # historial:
+  #   handler: src/infrastructure/controllers/HistorialController.handler
+  #   events:
+  #     - http:
+  #         path: historial
+  #         method: get
+
+plugins:
+  - serverless-offline
+  - serverless-esbuild
+
+custom:
+  esbuild:
+    bundle: true         # Empaqueta todas las dependencias necesarias
+    minify: false        # No minimiza el código para facilitar la depuración
+    sourcemap: true      # Genera un mapa de origen para depuración
+    exclude: ['aws-sdk'] # Excluye AWS SDK, ya que AWS Lambda lo incluye
+    target: 'node20'     # Especifica la versión de Node.js para el código
+    platform: 'node'
+    concurrency: 10      # Máximo de procesos paralelos para el empaquetado
