@@ -27,19 +27,19 @@ provider:
 
 functions:
   fusionados:
-    handler: src/infrastructure/controllers/FusionadosController.handler
+    handler: src/fusionados/infrastructure/controllers/FusionadosController.handler
     events:
       - http:
           path: fusionados
           method: get
   almacenar:
-    handler: src/infrastructure/controllers/AlmacenarController.handler
+    handler: src/users/infrastructure/controllers/AlmacenarController.handler
     events:
       - http:
           path: almacenar
           method: post
   historial:
-    handler: src/infrastructure/controllers/HistorialController.handler
+    handler: src/fusionados/infrastructure/controllers/HistorialController.handler
     events:
       - http:
           path: historial
@@ -66,11 +66,15 @@ resources:
       Properties:
         TableName: FusionadosTable
         AttributeDefinitions:
-          - AttributeName: id
+          - AttributeName: partitionKey
+            AttributeType: S
+          - AttributeName: sortKey
             AttributeType: S
         KeySchema:
-          - AttributeName: id
-            KeyType: HASH
+          - AttributeName: partitionKey
+            KeyType: HASH   # Llave de partición (Año-Mes)
+          - AttributeName: sortKey
+            KeyType: RANGE  # Llave de ordenamiento (fecha exacta)
         BillingMode: PAY_PER_REQUEST
 
     CustomDataTable:
