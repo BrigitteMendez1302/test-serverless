@@ -3,6 +3,7 @@ import { SwapiCharacter } from "../../src/fusionados/domain/entities/SwapiCharac
 import { StarWarsService } from "../../src/fusionados/infrastructure/integrations/StarWarsService";
 import { PokemonService } from "../../src/fusionados/infrastructure/integrations/PokemonService";
 import { DynamoFusionRepository } from "../../src/fusionados/infrastructure/repositories/DynamoFusionRepository";
+import { CacheRepository } from "../../src/fusionados/infrastructure/repositories/CacheRepository";
 
 // Mockear dependencias
 jest.mock("../../src/fusionados/infrastructure/integrations/StarWarsService");
@@ -14,17 +15,19 @@ describe("FusionService", () => {
   let starWarsService: jest.Mocked<StarWarsService>;
   let pokemonService: jest.Mocked<PokemonService>;
   let fusionRepository: jest.Mocked<DynamoFusionRepository>;
+  let cacheRepository: jest.Mocked<CacheRepository>;
+
 
   beforeEach(() => {
-    starWarsService = new StarWarsService() as jest.Mocked<StarWarsService>;
-    pokemonService = new PokemonService() as jest.Mocked<PokemonService>;
+    cacheRepository = new CacheRepository() as jest.Mocked<CacheRepository>;
+    starWarsService = new StarWarsService(cacheRepository) as jest.Mocked<StarWarsService>;
+    pokemonService = new PokemonService(cacheRepository) as jest.Mocked<PokemonService>;
     fusionRepository = new DynamoFusionRepository() as jest.Mocked<DynamoFusionRepository>;
 
     fusionService = new FusionService(starWarsService, pokemonService, fusionRepository);
   });
 
   it("debe fusionar correctamente los datos de personajes, planetas y Pokémon", async () => {
-    // Mock de datos
     const characters: SwapiCharacter[] = [
       { name: "Luke Skywalker", homeworld: "https://swapi.info/api/planets/1/" },
       { name: "R2-D2", homeworld: "https://swapi.info/api/planets/8/" },
@@ -48,13 +51,11 @@ describe("FusionService", () => {
       temperate: ["Bulbasaur", "Oddish"],
     };
 
-    // Configurar mocks
     starWarsService.getCharacters.mockResolvedValue(characters);
     starWarsService.getEnrichedPlanets.mockResolvedValue(planetMap);
     pokemonService.getEnrichedHabitats.mockResolvedValue(climateToPokemonMap);
     fusionRepository.saveFusionedData.mockResolvedValue();
 
-    // Llamar al servicio
     const result = await fusionService.getFusionedData();
 
     // Verificaciones
@@ -79,7 +80,6 @@ describe("FusionService", () => {
       },
     ]);
 
-    // Verificar resultado final
     expect(result).toEqual([
       {
         name: "Luke Skywalker",

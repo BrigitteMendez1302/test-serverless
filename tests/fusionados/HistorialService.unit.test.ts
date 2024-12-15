@@ -1,7 +1,6 @@
 import { HistorialService } from "../../src/fusionados/application/HistorialService";
 import { DynamoFusionRepository } from "../../src/fusionados/infrastructure/repositories/DynamoFusionRepository";
 
-// Mock del DynamoFusionRepository
 jest.mock("../../src/fusionados/infrastructure/repositories/DynamoFusionRepository");
 
 describe("HistorialService", () => {

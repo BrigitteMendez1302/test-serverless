@@ -6,11 +6,10 @@ import { CacheRepository } from "../repositories/CacheRepository";
 
 export class StarWarsService implements StarWarsAPI {
   private readonly baseURL = 'https://swapi.info/api/';
-  private readonly cacheRepository: CacheRepository;
 
-  constructor() {
-    this.cacheRepository = new CacheRepository();
-  }
+  constructor(
+    private cacheRepository: CacheRepository
+  ) {}
 
 
   async getCharacters(): Promise<SwapiCharacter[]> {

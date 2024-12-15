@@ -7,11 +7,10 @@ import { CacheRepository } from "../repositories/CacheRepository";
 
 export class PokemonService implements PokemonAPI {
   private readonly baseURL = 'https://pokeapi.co/api/v2/pokemon-habitat/';
-  private readonly cacheRepository: CacheRepository;
 
-  constructor() {
-    this.cacheRepository = new CacheRepository();
-  }
+  constructor(
+    private cacheRepository: CacheRepository
+  ) {}
 
   async getEnrichedHabitats(planets: Planet[]) : Promise<Record<string, string[]>> {
 
