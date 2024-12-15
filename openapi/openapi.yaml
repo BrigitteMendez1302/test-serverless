@@ -1,0 +1,31 @@
+openapi: 3.0.0
+info:
+  title: API Serverless Softek
+  description: Documentación de la API para el reto técnico
+  version: 1.0.0
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+  - url: https://v2xf7dt086.execute-api.us-east-1.amazonaws.com
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+tags:
+  - name: Custom
+    description: Operaciones personalizadas, como el almacenamiento de datos definidos por el usuario.
+  - name: Fusion
+    description: Funcionalidades de integración y fusión de datos entre APIs externas.
+  - name: History
+    description: Gestión del historial de datos almacenados.
+
+paths:
+  /fusionados:
+    $ref: fusionados/fusionados.yaml
+  /almacenar:
+    $ref: almacenar/almacenar.yaml
+  /historial:
+    $ref: historial/historial.yaml

@@ -7,7 +7,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const body = JSON.parse(event.body || "{}");
     const dynamoCustomDataRepository = new DynamoCustomDataRepository();
 
-    // Validar los campos requeridos
     if (!body.type || !body.content) {
       return {
         statusCode: 400,
@@ -18,7 +17,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const service = new CustomDataService(dynamoCustomDataRepository);
     await service.storeCustomData(body);
 
-    // Respuesta exitosa
     return {
       statusCode: 201,
       body: JSON.stringify({ message: "¡Datos almacenados exitosamente!" }),
