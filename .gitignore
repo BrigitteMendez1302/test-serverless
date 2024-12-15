@@ -16,3 +16,6 @@ swagger
 
 # dynamodb
 .dynamodb
+
+# .esbuild
+.esbuild
