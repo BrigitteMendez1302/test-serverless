@@ -1,42 +1,63 @@
-    post:
-      summary: Almacena información personalizada
-      description: Este endpoint permite guardar datos personalizados en la base de datos.
-      tags:
-        - Custom
-      operationId: postAlmacenar
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
+post:
+  summary: Almacena información personalizada
+  description: Este endpoint permite guardar datos personalizados en la base de datos.
+  tags:
+    - Custom
+  operationId: postAlmacenar
+  security:
+    - bearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - note
+              example: note
+            content:
               type: object
               properties:
-                type:
+                title:
                   type: string
-                  enum:
-                    - note
-                  example: note
-                content:
-                  type: object
-                  properties:
-                    title:
-                      type: string
-                      example: Test Note
-                    description:
-                      type: string
-                      example: This is a test note
-      responses:
-        '201':
-          description: Datos almacenados exitosamente
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "¡Datos almacenados exitosamente!"
-        '400':
-          description: Petición inválida
+                  example: "Test Note"
+                description:
+                  type: string
+                  example: "This is a test note"
+          required:
+            - type
+            - content
+  responses:
+    '201':
+      description: Datos almacenados exitosamente
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "¡Datos almacenados exitosamente!"
+    '400':
+      description: "Error de validación: faltan campos requeridos"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "El campo 'type' y 'content' son obligatorios."
+    '500':
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Ocurrió un error inesperado."

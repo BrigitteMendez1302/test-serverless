@@ -1,20 +1,19 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
+import { handleError, CustomError } from "../../../utils/errorHandler";
 import { CustomDataService } from "../../application/CustomDataService";
-import { DynamoCustomDataRepository } from '../repositories/DynamoCustomDataRepository';
+import { DynamoCustomDataRepository } from "../repositories/DynamoCustomDataRepository";
 
 export const handler: APIGatewayProxyHandler = async (event) => {
   try {
     const body = JSON.parse(event.body || "{}");
-    const dynamoCustomDataRepository = new DynamoCustomDataRepository();
 
     if (!body.type || !body.content) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "El campo 'type' y 'content' son obligatorios." }),
-      };
+      throw new CustomError("El campo 'type' y 'content' son obligatorios.", 400);
     }
 
+    const dynamoCustomDataRepository = new DynamoCustomDataRepository();
     const service = new CustomDataService(dynamoCustomDataRepository);
+
     await service.storeCustomData(body);
 
     return {
@@ -22,12 +21,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       body: JSON.stringify({ message: "¡Datos almacenados exitosamente!" }),
     };
   } catch (error) {
-    // Manejo de errores
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        error: error instanceof Error ? error.message : "Ocurrió un error inesperado.",
-      }),
-    };
+    return handleError(error);
   }
 };

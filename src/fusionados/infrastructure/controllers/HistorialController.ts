@@ -1,14 +1,24 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
+import { handleError, CustomError } from "../../../utils/errorHandler";
 import { HistorialService } from "../../application/HistorialService";
-import { DynamoFusionRepository } from '../repositories/DynamoFusionRepository';
+import { DynamoFusionRepository } from "../repositories/DynamoFusionRepository";
 
 export const handler: APIGatewayProxyHandler = async (event) => {
   try {
     const pageSize = parseInt(event.queryStringParameters?.pageSize || "10", 10);
     const npage = parseInt(event.queryStringParameters?.npage || "1", 10);
-    const fusionRepository = new DynamoFusionRepository();
 
+    if (isNaN(pageSize) || isNaN(npage) || pageSize <= 0 || npage <= 0) {
+      throw new CustomError("Los parámetros 'pageSize' y 'npage' deben ser números positivos.", 400);
+    }
+
+    if (pageSize > 10) {
+      throw new CustomError("El valor máximo permitido para 'pageSize' es 10.", 400);
+    }
+
+    const fusionRepository = new DynamoFusionRepository();
     const service = new HistorialService(fusionRepository);
+
     const result = await service.getHistory(pageSize, npage);
 
     return {
@@ -16,11 +26,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       body: JSON.stringify(result),
     };
   } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        error: error instanceof Error ? error.message : "Ocurrió un error inesperado.",
-      }),
-    };
+    return handleError(error);
   }
 };

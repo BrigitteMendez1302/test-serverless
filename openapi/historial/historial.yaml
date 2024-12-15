@@ -1,75 +1,96 @@
-    get:
-      summary: Consultar historial de datos almacenados
-      description: Retorna el historial de datos fusionados de manera paginada.
-      tags:
-        - History
-      operationId: getHistorial
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: pageSize
-          in: query
-          description: Número de elementos por página.
-          required: true
+get:
+  summary: Consultar historial de datos almacenados
+  description: Este endpoint retorna el historial de datos almacenados con soporte de paginación.
+  tags:
+    - History
+  operationId: getHistorial
+  security:
+    - bearerAuth: []
+  parameters:
+    - name: pageSize
+      in: query
+      description: Número de elementos por página (máximo 10).
+      required: true
+      schema:
+        type: integer
+        example: 5
+        minimum: 1
+        maximum: 10
+    - name: npage
+      in: query
+      description: Número de la página solicitada.
+      required: true
+      schema:
+        type: integer
+        example: 2
+        minimum: 1
+  responses:
+    '200':
+      description: Historial de datos paginado obtenido exitosamente.
+      content:
+        application/json:
           schema:
-            type: integer
-            example: 5
-        - name: npage
-          in: query
-          description: Número de página solicitada.
-          required: true
+            type: object
+            properties:
+              items:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    partitionKey:
+                      type: string
+                      example: "2024-12"
+                    climate:
+                      type: string
+                      example: arid
+                    sortKey:
+                      type: string
+                      example: "2024-12-15T16:25:31.061Z#932"
+                    homeworld:
+                      type: string
+                      example: "Tatooine"
+                    createdAt:
+                      type: string
+                      format: date-time
+                      example: "2024-12-15T16:25:31.061Z"
+                    id:
+                      type: string
+                      format: uuid
+                      example: "37d3b52a-7b49-4864-8749-67d417fbdd19"
+                    pokemon_friend:
+                      type: array
+                      items:
+                        type: string
+                        example: "spearow"
+                    name:
+                      type: string
+                      example: "R5-D4"
+              currentPage:
+                type: integer
+                example: 2
+              totalPages:
+                type: integer
+                example: 6
+              totalItems:
+                type: integer
+                example: 30
+    '400':
+      description: Petición inválida debido a parámetros incorrectos.
+      content:
+        application/json:
           schema:
-            type: integer
-            example: 2
-      responses:
-        '200':
-          description: Respuesta exitosa
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        partitionKey:
-                          type: string
-                          example: "2024-12"
-                        climate:
-                          type: string
-                          example: arid
-                        sortKey:
-                          type: string
-                          example: "2024-12-15T16:25:31.061Z#932"
-                        homeworld:
-                          type: string
-                          example: Tatooine
-                        createdAt:
-                          type: string
-                          format: date-time
-                          example: "2024-12-15T16:25:31.061Z"
-                        id:
-                          type: string
-                          format: uuid
-                          example: "37d3b52a-7b49-4864-8749-67d417fbdd19"
-                        pokemon_friend:
-                          type: array
-                          items:
-                            type: string
-                            example: spearow
-                        name:
-                          type: string
-                          example: "R5-D4"
-                  currentPage:
-                    type: integer
-                    example: 2
-                  totalPages:
-                    type: integer
-                    example: 6
-                  totalItems:
-                    type: integer
-                    example: 30
-        '400':
-          description: Petición inválida
+            type: object
+            properties:
+              error:
+                type: string
+                example: "El valor máximo permitido para 'pageSize' es 10."
+    '500':
+      description: Error interno del servidor.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Ocurrió un error inesperado."
