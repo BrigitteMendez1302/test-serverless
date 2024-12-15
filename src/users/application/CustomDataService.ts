@@ -11,9 +11,9 @@ export class CustomDataService {
     if (typeof data.type !== "string") {
       throw new Error("El campo 'type' debe ser un string.");
     }
-    if (typeof data.content !== "object") {
+    if (typeof data.content !== "object" || data.content === null) {
       throw new Error("El campo 'content' debe ser un objeto.");
-    }
+    }    
 
     if (!data.createdAt) {
       data.createdAt = new Date().toISOString(); // Asignamos la fecha y hora actual

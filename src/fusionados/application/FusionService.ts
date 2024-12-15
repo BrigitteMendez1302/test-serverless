@@ -22,7 +22,6 @@ export class FusionService {
 
     const fusionedCharacters = characters.map((character: SwapiCharacter) => {
       const planet = planetMap[character.homeworld];
-
       const climate = planet.climate.split(",")[0].trim();
 
       const possiblePokemon = climateToPokemonMap[climate] || [];

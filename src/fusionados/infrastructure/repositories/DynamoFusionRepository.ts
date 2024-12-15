@@ -101,6 +101,20 @@ export class DynamoFusionRepository implements FusionRepository{
     const endIndex = npage * pageSize; // Índice final del rango
     let accumulatedRecords: any[] = []; // Acumulación de registros
     let exclusiveStartKey: any = undefined; // Llave para continuar consultas
+
+    // Calcula el total de registros (opcional, puedes optimizar según necesidades)
+    const totalItems = await this.getTotalCount();
+    const totalPages = Math.ceil(totalItems / pageSize);
+      
+    if (totalItems === 0 || npage > totalPages) {
+      return {
+        items: [],
+        currentPage: npage > totalPages ? npage : 1,
+        totalPages,
+        totalItems,
+      };
+    }
+    
   
     // Obtén todas las particiones cronológicamente ascendentes
     const partitions = this.getPartitionKeys();
@@ -136,14 +150,6 @@ export class DynamoFusionRepository implements FusionRepository{
       if (accumulatedRecords.length >= endIndex) {
         break;
       }
-    }
-  
-    // Calcula el total de registros (opcional, puedes optimizar según necesidades)
-    const totalItems = await this.getTotalCount();
-    const totalPages = Math.ceil(totalItems / pageSize);
-  
-    if (npage > totalPages) {
-      throw new Error(`La página solicitada (${npage}) no existe. Total de páginas: ${totalPages}.`);
     }
   
     // Filtra los registros acumulados para obtener el rango solicitado
