@@ -1,4 +1,5 @@
 import { CustomDataRepository } from "../domain/repositories/CustomDataRepository";
+import { CustomData } from "../domain/entities/CustomData";
 
 export class CustomDataService {
 
@@ -6,8 +7,7 @@ export class CustomDataService {
     private repository: CustomDataRepository
   ) {}
 
-  async storeCustomData(data: { type: string; content: Record<string, unknown> }): Promise<void> {
-    // Validar el contenido (reglas adicionales si es necesario)
+  async storeCustomData(data: CustomData): Promise<void> {
     if (typeof data.type !== "string") {
       throw new Error("El campo 'type' debe ser un string.");
     }
@@ -15,16 +15,10 @@ export class CustomDataService {
       throw new Error("El campo 'content' debe ser un objeto.");
     }
 
-    // Transformar datos si es necesario
-    const transformedData = {
-      ...data,
-      metadata: {
-        storedBy: "CustomService",
-        storedAt: new Date().toISOString(),
-      },
-    };
+    if (!data.createdAt) {
+      data.createdAt = new Date().toISOString(); // Asignamos la fecha y hora actual
+    }
 
-    // Delegar al repositorio
-    await this.repository.storeCustomData(transformedData);
+    await this.repository.storeCustomData(data);
   }
 }

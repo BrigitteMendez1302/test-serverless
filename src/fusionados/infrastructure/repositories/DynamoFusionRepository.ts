@@ -10,15 +10,12 @@ export class DynamoFusionRepository implements FusionRepository{
   private dynamoDbClient: DynamoDBClient;
   private tableName: string;
 
-  // Inicializa el cliente DynamoDB y el nombre de la tabla
   constructor() {
     this.dynamoDbClient = new DynamoDBClient({ region: process.env.AWS_REGION });
-    this.tableName = process.env.FUSIONADOS_TABLE!; // Nombre de la tabla desde el entorno
+    this.tableName = process.env.FUSIONADOS_TABLE!;
   }
 
   async saveFusionedData(data: Character[]): Promise<void> {
-
-    console.log("data.length; ", data.length);
 
     const promises = data.map((character) => {
       // Generar el partitionKey basado en el Año-Mes del registro
@@ -75,7 +72,7 @@ export class DynamoFusionRepository implements FusionRepository{
 
   private getPartitionKeys(): string[] {
     const startYear = 2024;
-    const startMonth = 12; // El primer registro comienza en diciembre de 2024
+    const startMonth = 12;
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
   

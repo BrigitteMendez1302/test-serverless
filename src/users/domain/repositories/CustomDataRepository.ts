@@ -1,3 +1,4 @@
+import { CustomData } from "../entities/CustomData";
 export interface CustomDataRepository {
-    storeCustomData(data: { type: string; content: Record<string, unknown> }): Promise<void>;
+    storeCustomData(data: CustomData): Promise<void>;
 }

@@ -12,26 +12,19 @@ export class FusionService {
   ) {}
 
   async getFusionedData(): Promise<Character[]> {
-    // Obtener personajes
     const characters: SwapiCharacter[] = await this.starWarsService.getCharacters();
 
-    // Obtener planetas únicos enriquecidos
     const planetMap = await this.starWarsService.getEnrichedPlanets(characters);
 
-
-    // Obtener mapeo clima -> Pokémon
     const planets = Object.values(planetMap); // Extraer detalles de planetas
     const climateToPokemonMap = await this.pokemonService.getEnrichedHabitats(planets);
 
 
-    // Enriquecer personajes con Pokémon
     const fusionedCharacters = characters.map((character: SwapiCharacter) => {
       const planet = planetMap[character.homeworld];
 
-      // Obtener el clima principal del planeta
       const climate = planet.climate.split(",")[0].trim();
 
-      // Obtener Pokémon asociados al clima
       const possiblePokemon = climateToPokemonMap[climate] || [];
 
       return {

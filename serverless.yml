@@ -5,22 +5,25 @@ provider:
   name: aws
   runtime: nodejs20.x
   region: us-east-1
-  iamRoleStatements:  # Declaración de permisos IAM para DynamoDB
+  iamRoleStatements:
     - Effect: Allow
       Action:
-        - dynamodb:PutItem   # Permite insertar elementos
-        - dynamodb:GetItem   # Permite obtener elementos
-        - dynamodb:Scan      # Permite escanear la tabla
+        - dynamodb:PutItem
+        - dynamodb:GetItem
+        - dynamodb:Scan
+        - dynamodb:Query
       Resource:
-        - "arn:aws:dynamodb:${self:provider.region}:*:table/FusionadosTable" # Tabla DynamoDB específica
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/FusionadosTable"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/CustomDataTable"
-  memorySize: 128       # Tamaño de memoria para Lambda (ajusta según necesidad)
-  timeout: 20           # Tiempo máximo de ejecución en segundos
-  environment:          # Variables de entorno para DynamoDB u otras configuraciones
-    FUSIONADOS_TABLE: FusionadosTable  # Nombre de la tabla DynamoDB
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/CacheTable"
+  memorySize: 128
+  timeout: 20
+  environment:
+    FUSIONADOS_TABLE: FusionadosTable
     CUSTOM_DATA_TABLE: CustomDataTable
+    CACHE_TABLE: CacheTable
   logs:
-    restApi: true       # Habilita logs detallados para API Gateway
+    restApi: true
     role: serverlessApiGatewayCloudWatchRole
     frameworkLambda: true # Logs para Serverless Framework
 
@@ -51,13 +54,13 @@ plugins:
 
 custom:
   esbuild:
-    bundle: true         # Empaqueta todas las dependencias necesarias
-    minify: false        # No minimiza el código para facilitar la depuración
-    sourcemap: true      # Genera un mapa de origen para depuración
-    exclude: ['aws-sdk'] # Excluye AWS SDK, ya que AWS Lambda lo incluye
-    target: 'node20'     # Especifica la versión de Node.js para el código
+    bundle: true
+    minify: false
+    sourcemap: true
+    exclude: ['aws-sdk']
+    target: 'node20'
     platform: 'node'
-    concurrency: 10      # Máximo de procesos paralelos para el empaquetado
+    concurrency: 10
 
 resources:
   Resources:
@@ -72,9 +75,9 @@ resources:
             AttributeType: S
         KeySchema:
           - AttributeName: partitionKey
-            KeyType: HASH   # Llave de partición (Año-Mes)
+            KeyType: HASH
           - AttributeName: sortKey
-            KeyType: RANGE  # Llave de ordenamiento (fecha exacta)
+            KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
 
     CustomDataTable:
@@ -88,3 +91,18 @@ resources:
           - AttributeName: id
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
+        
+    CacheTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: CacheTable
+        AttributeDefinitions:
+          - AttributeName: cacheKey
+            AttributeType: S
+        KeySchema:
+          - AttributeName: cacheKey
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TimeToLiveSpecification:
+          AttributeName: expiresAt
+          Enabled: true

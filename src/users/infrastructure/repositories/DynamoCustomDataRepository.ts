@@ -1,6 +1,7 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
 import { CustomDataRepository } from "../../domain/repositories/CustomDataRepository";
+import { CustomData } from "../../domain/entities/CustomData";
 
 
 export class DynamoCustomDataRepository implements CustomDataRepository{
@@ -12,7 +13,7 @@ export class DynamoCustomDataRepository implements CustomDataRepository{
     this.tableName = process.env.CUSTOM_DATA_TABLE!;
   }
 
-  async storeCustomData(data: { type: string; content: Record<string, unknown>; }): Promise<void> {
+  async storeCustomData(data: CustomData): Promise<void> {
     const record = {
       id: `custom-${Date.now()}`,
       ...data,
