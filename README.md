@@ -40,10 +40,10 @@ El objetivo principal es ofrecer un conjunto de funcionalidades que permiten:
    serverless deploy
    ```
 
-3. **Generar documentación con Redocli**:
+3. **Ver documentación de Redocli**:
 
    ```bash
-   redocly preview-docs openapi.yaml
+   redocly preview-docs openapi/openapi.yaml
    ```
 
    Visualizar la documentación en [http://127.0.0.1:8080](http://127.0.0.1:8080).
