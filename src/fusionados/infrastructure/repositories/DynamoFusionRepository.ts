@@ -3,7 +3,7 @@ import { PutCommand } from "@aws-sdk/lib-dynamodb";
 import { Character } from "../../domain/entities/Character";
 import { FusionRepository } from "../../domain/repositories/FusionRepository";
 import { v4 as uuidv4 } from 'uuid';
-import { unmarshall } from "@aws-sdk/util-dynamodb"; // Importar la función unmarshall
+import { unmarshall } from "@aws-sdk/util-dynamodb";
 
 
 export class DynamoFusionRepository implements FusionRepository{
@@ -18,18 +18,17 @@ export class DynamoFusionRepository implements FusionRepository{
   async saveFusionedData(data: Character[]): Promise<void> {
 
     const promises = data.map((character) => {
-      // Generar el partitionKey basado en el Año-Mes del registro
       const createdAt = new Date().toISOString();
-      const uniqueSuffix = `#${Math.floor(Math.random() * 1000)}`; // Milisegundos aleatorios para unicidad
-      const sortKey = `${createdAt}${uniqueSuffix}`; // Concatenar timestamp con sufijo único
-      const [year, month] = createdAt.split('-'); // Extrae año y mes del timestamp
-      const partitionKey = `${year}-${month}`; // Genera el valor de la partición
+      const uniqueSuffix = `#${Math.floor(Math.random() * 1000)}`;
+      const sortKey = `${createdAt}${uniqueSuffix}`;
+      const [year, month] = createdAt.split('-');
+      const partitionKey = `${year}-${month}`;
   
       const record = {
-        partitionKey, // Llave de partición (Año-Mes)
-        createdAt,    // Llave de ordenamiento (ISO 8601)
-        sortKey,      // Llave de ordenamiento única
-        id: uuidv4(), // ID único para el registro
+        partitionKey,
+        createdAt,
+        sortKey,
+        id: uuidv4(),
         name: character.name,
         homeworld: character.homeworld,
         climate: character.climate,
@@ -41,11 +40,9 @@ export class DynamoFusionRepository implements FusionRepository{
         Item: record,
       };
   
-      // Retorna una promesa para guardar cada registro
       return this.dynamoDbClient.send(new PutCommand(params));
     });
   
-    // Espera a que todas las operaciones se completen
     await Promise.all(promises);
   }
   
@@ -57,15 +54,15 @@ export class DynamoFusionRepository implements FusionRepository{
     do {
       const params: ScanCommandInput = {
         TableName: this.tableName,
-        Select: "COUNT", // Solo cuenta registros, no devuelve datos
+        Select: "COUNT",
         ExclusiveStartKey: exclusiveStartKey,
       };
 
       const response = await this.dynamoDbClient.send(new ScanCommand(params));
 
-      totalCount += response.Count || 0; // Acumula el conteo parcial
-      exclusiveStartKey = response.LastEvaluatedKey; // Llave para continuar el escaneo
-    } while (exclusiveStartKey); // Continua mientras haya más datos
+      totalCount += response.Count || 0;
+      exclusiveStartKey = response.LastEvaluatedKey;
+    } while (exclusiveStartKey);
 
     return totalCount;
   }
@@ -97,12 +94,11 @@ export class DynamoFusionRepository implements FusionRepository{
     totalPages: number;
     totalItems: number;
   }> {
-    const startIndex = (npage - 1) * pageSize + 1; // Índice inicial del rango
-    const endIndex = npage * pageSize; // Índice final del rango
-    let accumulatedRecords: any[] = []; // Acumulación de registros
-    let exclusiveStartKey: any = undefined; // Llave para continuar consultas
+    const startIndex = (npage - 1) * pageSize + 1;
+    const endIndex = npage * pageSize;
+    let accumulatedRecords: any[] = [];
+    let exclusiveStartKey: any = undefined;
 
-    // Calcula el total de registros (opcional, puedes optimizar según necesidades)
     const totalItems = await this.getTotalCount();
     const totalPages = Math.ceil(totalItems / pageSize);
       
@@ -116,10 +112,8 @@ export class DynamoFusionRepository implements FusionRepository{
     }
     
   
-    // Obtén todas las particiones cronológicamente ascendentes
     const partitions = this.getPartitionKeys();
   
-    // Iterar sobre las particiones
     for (const partition of partitions) {
       while (accumulatedRecords.length < endIndex) {
         const params: QueryCommandInput = {
@@ -129,30 +123,27 @@ export class DynamoFusionRepository implements FusionRepository{
             "#partitionKey": "partitionKey",
           },
           ExpressionAttributeValues: {
-            ":partitionValue": { S: partition }, // Especifica que el valor es un string
+            ":partitionValue": { S: partition },
           },
-          ScanIndexForward: true, // Orden ascendente por createdAt
+          ScanIndexForward: true,
           ExclusiveStartKey: exclusiveStartKey,
         };
   
         const response = await this.dynamoDbClient.send(new QueryCommand(params));
         exclusiveStartKey = response.LastEvaluatedKey;
   
-        // Acumula los registros
         accumulatedRecords.push(...(response.Items || []));
   
         if (!exclusiveStartKey) {
-          break; // No hay más registros en esta partición
+          break;
         }
       }
   
-      // Si ya se acumularon suficientes registros, detener iteración
       if (accumulatedRecords.length >= endIndex) {
         break;
       }
     }
   
-    // Filtra los registros acumulados para obtener el rango solicitado
     const paginatedItemsRaw = accumulatedRecords.slice(startIndex - 1, endIndex);
     const paginatedItems = paginatedItemsRaw.map((item) => unmarshall(item));
   

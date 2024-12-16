@@ -10,16 +10,17 @@ export class DynamoCustomDataRepository implements CustomDataRepository{
 
   constructor() {
     this.dynamoDbClient = new DynamoDBClient({ region: process.env.AWS_REGION });
-    this.tableName = process.env.CUSTOM_DATA_TABLE!;
+    this.tableName = process.env.CUSTOM_DATA_TABLE_NAME || "CustomDataTable";
   }
 
   async storeCustomData(data: CustomData): Promise<void> {
     const record = {
-      id: `custom-${Date.now()}`,
-      ...data,
-      createdAt: new Date().toISOString(),
+      id: data.id || `custom-${Date.now()}`, // Usa el id proporcionado o genera uno nuevo
+      type: data.type,
+      content: data.content,
+      createdAt: data.createdAt || new Date().toISOString(), // Mantén la fecha si ya existe
     };
-
+  
     await this.dynamoDbClient.send(
       new PutCommand({
         TableName: this.tableName,
