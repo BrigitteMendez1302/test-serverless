@@ -1,0 +1,44 @@
+post:
+  summary: Registro de nuevos usuarios
+  description: Permite registrar un nuevo usuario en el sistema.
+  tags:
+    - Authentication
+  operationId: postSignup
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            username:
+              type: string
+              example: "johndoe"
+            password:
+              type: string
+              format: password
+              example: "P@ssw0rd!"
+          required:
+            - username
+            - password
+  responses:
+    '201':
+      description: Usuario registrado exitosamente.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Usuario registrado exitosamente."
+    '400':
+      description: Error de validación.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "El usuario ya existe."
