@@ -153,7 +153,7 @@ El objetivo principal es ofrecer un conjunto de funcionalidades que permiten:
 
 ## **Postman Collection**
 
-Entrar a este link: [Postman endpoints](https://www.postman.com/security-pilot-62443805/softek/collection/39888305-e75d4259-f9f3-41c8-b23e-229724dc43e7/?action=share&creator=39888305)
+Entrar a este link: [Postman endpoints](https://www.postman.com/security-pilot-62443805/softek-test)
 
 ---
 
