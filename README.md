@@ -43,7 +43,7 @@ El objetivo principal es ofrecer un conjunto de funcionalidades que permiten:
 3. **Generar documentación con Redocli**:
 
    ```bash
-   npx redoc-cli serve openapi.yaml
+   redocly preview-docs openapi.yaml
    ```
 
    Visualizar la documentación en [http://127.0.0.1:8080](http://127.0.0.1:8080).
@@ -139,7 +139,7 @@ El objetivo principal es ofrecer un conjunto de funcionalidades que permiten:
 
 1. **Clonar el repositorio**:
    ```bash
-   git clone <url-del-repositorio>
+   git clone git@github.com:BrigitteMendez1302/test-serverless.git
    ```
 
 2. **Crear un branch para cambios**:
@@ -153,7 +153,7 @@ El objetivo principal es ofrecer un conjunto de funcionalidades que permiten:
 
 ## **Postman Collection**
 
-Entrar a este link: [Postman endpoints](https://www.postman.com/security-pilot-62443805/softek/collection/39888305-e75d4259-f9f3-41c8-b23e-229724dc43e7/?action=share&creator=39888305)
+Entrar a este link: [Postman endpoints](https://www.postman.com/security-pilot-62443805/softek-test)
 
 ---
 
