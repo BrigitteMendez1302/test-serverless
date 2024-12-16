@@ -15,10 +15,10 @@ export class DynamoCustomDataRepository implements CustomDataRepository{
 
   async storeCustomData(data: CustomData): Promise<void> {
     const record = {
-      id: data.id || `custom-${Date.now()}`, // Usa el id proporcionado o genera uno nuevo
+      id: data.id || `custom-${Date.now()}`,
       type: data.type,
       content: data.content,
-      createdAt: data.createdAt || new Date().toISOString(), // Mantén la fecha si ya existe
+      createdAt: data.createdAt || new Date().toISOString(),
     };
   
     await this.dynamoDbClient.send(

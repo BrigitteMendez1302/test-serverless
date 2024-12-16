@@ -16,7 +16,7 @@ export class FusionService {
 
     const planetMap = await this.starWarsService.getEnrichedPlanets(characters);
 
-    const planets = Object.values(planetMap); // Extraer detalles de planetas
+    const planets = Object.values(planetMap);
     const climateToPokemonMap = await this.pokemonService.getEnrichedHabitats(planets);
 
 
@@ -30,7 +30,7 @@ export class FusionService {
         name: character.name,
         homeworld: planet.name,
         climate: planet.climate,
-        pokemon_friend: possiblePokemon.slice(0, 5), // Limitar a 5 Pokémon
+        pokemon_friend: possiblePokemon.slice(0, 5),
       };
     });
 

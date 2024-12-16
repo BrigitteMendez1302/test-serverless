@@ -34,7 +34,7 @@ describe("CustomDataService", () => {
 
   it("debe lanzar un error si 'type' no es un string", async () => {
     const invalidData: CustomData = {
-      type: 123 as unknown as string, // Simula un tipo incorrecto
+      type: 123 as unknown as string,
       content: { key: "value" },
       createdAt: undefined,
     };

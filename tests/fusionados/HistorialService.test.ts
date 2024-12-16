@@ -25,7 +25,6 @@ describe("HistorialService", () => {
   });
 
   it("debe llamar a fusionRepository.getChronologicalRecords con parámetros correctos", async () => {
-    // Mock del resultado esperado
     const mockResponse = {
       items: [
         {
@@ -67,13 +66,10 @@ describe("HistorialService", () => {
     };
     fusionRepository.getChronologicalRecords.mockResolvedValue(mockResponse);
 
-    // Ejecutar el método con parámetros válidos
     const result = await historialService.getHistory(2, 1);
 
-    // Verificar que fusionRepository fue llamado correctamente
     expect(fusionRepository.getChronologicalRecords).toHaveBeenCalledWith(2, 1);
 
-    // Verificar que el resultado sea el esperado
     expect(result).toEqual(mockResponse);
   });
 

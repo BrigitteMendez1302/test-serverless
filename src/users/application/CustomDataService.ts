@@ -16,7 +16,7 @@ export class CustomDataService {
     }    
 
     if (!data.createdAt) {
-      data.createdAt = new Date().toISOString(); // Asignamos la fecha y hora actual
+      data.createdAt = new Date().toISOString();
     }
 
     await this.repository.storeCustomData(data);

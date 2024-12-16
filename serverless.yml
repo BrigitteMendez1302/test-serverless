@@ -3,8 +3,17 @@ frameworkVersion: '3'
 
 provider:
   name: aws
+  stage: dev
   runtime: nodejs20.x
   region: us-east-1
+  memorySize: 128
+  timeout: 20
+  environment:
+    COGNITO_USER_POOL_ID: !Ref CognitoUserPool
+    COGNITO_APP_CLIENT_ID: !Ref CognitoUserPoolClient
+    FUSIONADOS_TABLE: FusionadosTable
+    CUSTOM_DATA_TABLE: CustomDataTable
+    CACHE_TABLE: CacheTable
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -16,17 +25,22 @@ provider:
         - "arn:aws:dynamodb:${self:provider.region}:*:table/FusionadosTable"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/CustomDataTable"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/CacheTable"
-  memorySize: 128
-  timeout: 20
-  environment:
-    FUSIONADOS_TABLE: FusionadosTable
-    CUSTOM_DATA_TABLE: CustomDataTable
-    CACHE_TABLE: CacheTable
+    - Effect: Allow
+      Action:
+        - cognito-idp:CreateUserPool
+        - cognito-idp:CreateUserPoolClient
+        - cognito-idp:DeleteUserPool
+        - cognito-idp:DeleteUserPoolClient
+        - cognito-idp:AdminCreateUser
+        - cognito-idp:AdminInitiateAuth
+        - cognito-idp:SignUp
+        - cognito-idp:AdminConfirmSignUp
+      Resource:
+        - "arn:aws:cognito-idp:${self:provider.region}:${aws:accountId}:userpool/*"
   logs:
     restApi: true
     role: serverlessApiGatewayCloudWatchRole
-    frameworkLambda: true # Logs para Serverless Framework
-
+    frameworkLambda: true
 
 functions:
   fusionados:
@@ -35,18 +49,44 @@ functions:
       - http:
           path: fusionados
           method: get
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer
+
   almacenar:
     handler: src/users/infrastructure/controllers/AlmacenarController.handler
     events:
       - http:
           path: almacenar
           method: post
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer
+
   historial:
     handler: src/fusionados/infrastructure/controllers/HistorialController.handler
     events:
       - http:
           path: historial
           method: get
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer
+  login:
+    handler: src/auth/infrastructure/controllers/LoginController.handler
+    events:
+      - http:
+          path: login
+          method: post
+  signup:
+    handler: src/auth/infrastructure/controllers/SignupController.handler
+    events:
+      - http:
+          path: signup
+          method: post
 
 plugins:
   - serverless-offline
@@ -106,3 +146,34 @@ resources:
         TimeToLiveSpecification:
           AttributeName: expiresAt
           Enabled: true
+    CognitoUserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: ${self:service}-${self:provider.stage}-user-pool
+        AutoVerifiedAttributes:
+          - email
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 8
+            RequireLowercase: true
+            RequireNumbers: true
+            RequireUppercase: true
+    CognitoUserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: ${self:service}-${self:provider.stage}-user-pool-client
+        UserPoolId:
+          Ref: CognitoUserPool
+        ExplicitAuthFlows:
+          - ADMIN_NO_SRP_AUTH
+          - USER_PASSWORD_AUTH
+    ApiGatewayAuthorizer:
+      Type: AWS::ApiGateway::Authorizer
+      Properties:
+        Name: CognitoUserPoolAuthorizer
+        Type: COGNITO_USER_POOLS
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        IdentitySource: method.request.header.Authorization
+        ProviderARNs:
+          - !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${CognitoUserPool}
