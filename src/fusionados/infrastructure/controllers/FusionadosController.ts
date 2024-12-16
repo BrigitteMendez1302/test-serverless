@@ -5,9 +5,9 @@ import { PokemonService } from "../integrations/PokemonService";
 import { FusionService } from "../../application/FusionService";
 import { DynamoFusionRepository } from "../repositories/DynamoFusionRepository";
 import { CacheRepository } from "../repositories/CacheRepository";
+import { authMiddleware } from "../../../auth/infrastructure/middleware/AuthMiddleware";
 
-export const handler: APIGatewayProxyHandler = async () => {
-
+const fusionHandler: APIGatewayProxyHandler = async () => {
   try {
     const fusionRepository = new DynamoFusionRepository();
     const cacheRepository = new CacheRepository();
@@ -24,3 +24,6 @@ export const handler: APIGatewayProxyHandler = async () => {
     return handleError(error);
   }
 };
+
+// Envuelve el controlador con el middleware sin cambiar el `serverless.yml`
+export const handler = authMiddleware(fusionHandler);

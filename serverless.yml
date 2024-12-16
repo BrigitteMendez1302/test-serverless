@@ -16,9 +16,11 @@ provider:
         - "arn:aws:dynamodb:${self:provider.region}:*:table/FusionadosTable"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/CustomDataTable"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/CacheTable"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/UsersTable"
   memorySize: 128
   timeout: 20
   environment:
+    JWT_SECRET: ${env:JWT_SECRET, "your-secret-key"}
     FUSIONADOS_TABLE: FusionadosTable
     CUSTOM_DATA_TABLE: CustomDataTable
     CACHE_TABLE: CacheTable
@@ -47,6 +49,18 @@ functions:
       - http:
           path: historial
           method: get
+  signup:
+    handler: src/auth/infrastructure/controllers/AuthController.signup
+    events:
+      - http:
+          path: signup
+          method: post
+  login:
+    handler: src/auth//infrastructure/controllers/AuthController.login
+    events:
+      - http:
+          path: login
+          method: post
 
 plugins:
   - serverless-offline
@@ -106,3 +120,14 @@ resources:
         TimeToLiveSpecification:
           AttributeName: expiresAt
           Enabled: true
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: UsersTable
+        AttributeDefinitions:
+          - AttributeName: username
+            AttributeType: S
+        KeySchema:
+          - AttributeName: username
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST

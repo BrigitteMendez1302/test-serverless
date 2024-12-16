@@ -2,8 +2,9 @@ import { APIGatewayProxyHandler } from "aws-lambda";
 import { handleError, CustomError } from "../../../utils/errorHandler";
 import { HistorialService } from "../../application/HistorialService";
 import { DynamoFusionRepository } from "../repositories/DynamoFusionRepository";
+import { authMiddleware } from "../../../auth/infrastructure/middleware/AuthMiddleware";
 
-export const handler: APIGatewayProxyHandler = async (event) => {
+const historialHandler: APIGatewayProxyHandler = async (event) => {
   try {
     const pageSize = parseInt(event.queryStringParameters?.pageSize || "10", 10);
     const npage = parseInt(event.queryStringParameters?.npage || "1", 10);
@@ -29,3 +30,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     return handleError(error);
   }
 };
+
+// Exporta el controlador protegido con el middleware de autenticación
+export const handler = authMiddleware(historialHandler);

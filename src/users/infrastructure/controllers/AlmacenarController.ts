@@ -2,8 +2,9 @@ import { APIGatewayProxyHandler } from "aws-lambda";
 import { handleError, CustomError } from "../../../utils/errorHandler";
 import { CustomDataService } from "../../application/CustomDataService";
 import { DynamoCustomDataRepository } from "../repositories/DynamoCustomDataRepository";
+import { authMiddleware } from "../../../auth/infrastructure/middleware/AuthMiddleware";
 
-export const handler: APIGatewayProxyHandler = async (event) => {
+const customDataHandler: APIGatewayProxyHandler = async (event) => {
   try {
     const body = JSON.parse(event.body || "{}");
 
@@ -24,3 +25,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     return handleError(error);
   }
 };
+
+// Exporta el controlador protegido por el middleware
+export const handler = authMiddleware(customDataHandler);
