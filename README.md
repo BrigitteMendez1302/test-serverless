@@ -139,7 +139,7 @@ El objetivo principal es ofrecer un conjunto de funcionalidades que permiten:
 
 1. **Clonar el repositorio**:
    ```bash
-   git clone <url-del-repositorio>
+   git clone git@github.com:BrigitteMendez1302/test-serverless.git
    ```
 
 2. **Crear un branch para cambios**:
